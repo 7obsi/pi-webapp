@@ -1,0 +1,15 @@
+<ul class="tasks">
+{% for task in tasks %}
+  <li class="task {% if task.status == 'done' %}task-done{% endif %}">
+    <span class="task-text">{{ task.text }}</span>
+    <span class="task-meta">{{ task.creator.name }}</span>
+    {% if task.status == 'open' %}
+    <form method="post" action="/tasks/{{ task.id }}/done" class="inline-form">
+      <button type="submit" title="Erledigt">&#10003;</button>
+    </form>
+    {% endif %}
+  </li>
+{% else %}
+  <li class="no-tasks">Keine Aufgaben vorhanden.</li>
+{% endfor %}
+</ul>

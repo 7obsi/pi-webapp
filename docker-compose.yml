@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      - STREAM_URL=/stream
+    volumes:
+      - db-data:/app
+    restart: unless-stopped
+
+  stream:
+    build: .
+    command: python scripts/webcam_stream.py
+    devices:
+      - /dev/video0:/dev/video0
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - web
+      - stream
+    restart: unless-stopped
+
+volumes:
+  db-data:

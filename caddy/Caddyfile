@@ -1,0 +1,5 @@
+:80 {
+    reverse_proxy /stream stream:8081
+
+    reverse_proxy web:8000
+}

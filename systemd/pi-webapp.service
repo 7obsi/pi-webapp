@@ -1,0 +1,14 @@
+[Unit]
+Description=Pi Webapp (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/pi-webapp
+ExecStart=/home/pi/pi-webapp/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

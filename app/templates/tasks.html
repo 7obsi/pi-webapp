@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Aufgaben{% endblock %}
+
+{% block body %}
+<div class="container">
+  <header class="topbar">
+    <h1>Aufgaben</h1>
+    <span class="user-info">{{ user.name }} &middot; <a href="/logout">Logout</a></span>
+  </header>
+
+  <section class="stream-section">
+    <img id="webcam" alt="Webcam Stream" class="stream">
+  </section>
+
+  <section class="task-form">
+    <form method="post" action="/tasks">
+      <input name="text" type="text" required placeholder="Neue Aufgabe..." autocomplete="off">
+      <button type="submit">Hinzufuegen</button>
+    </form>
+  </section>
+
+  <section id="task-list">
+    {% include "tasks_partial.html" %}
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  // Stream: use same hostname as page, port 8081
+  document.getElementById("webcam").src = location.protocol + "//" + location.hostname + ":8081";
+
+  const proto = location.protocol === "https:" ? "wss:" : "ws:";
+  const ws = new WebSocket(proto + "//" + location.host + "/ws");
+  ws.onmessage = function(ev) {
+    const msg = JSON.parse(ev.data);
+    if (msg.type === "tasks_updated") {
+      fetch("/tasks/partial")
+        .then(r => r.text())
+        .then(html => { document.getElementById("task-list").innerHTML = html; });
+    }
+  };
+  ws.onclose = function() {
+    setTimeout(function() { location.reload(); }, 3000);
+  };
+})();
+</script>
+{% endblock %}
