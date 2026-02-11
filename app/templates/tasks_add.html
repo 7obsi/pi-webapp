@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Aufgabe hinzufuegen{% endblock %}
+
+{% block body %}
+<div class="container mobile-page">
+  <h1>Neue Aufgabe</h1>
+
+  {% if saved %}
+  <div class="saved-msg" id="saved-msg">Gespeichert!</div>
+  {% endif %}
+
+  <form method="post" action="/tasks/add" class="add-task-form">
+    <textarea name="text" required placeholder="Aufgabe eingeben..." rows="3" autofocus></textarea>
+    <button type="submit">OK</button>
+  </form>
+
+  <nav class="bottom-nav">
+    <a href="/admin">Admin</a>
+    <a href="/tasks/manage">Aufgaben verwalten</a>
+  </nav>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if saved %}
+<script>
+setTimeout(function() {
+  var msg = document.getElementById("saved-msg");
+  if (msg) msg.style.display = "none";
+}, 2000);
+</script>
+{% endif %}
+{% endblock %}

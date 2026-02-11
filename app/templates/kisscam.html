@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% block title %}Kiss Cam{% endblock %}
+
+{% block body %}
+<div id="audio-unlock" class="audio-unlock" onclick="this.style.display='none';window._audioUnlocked=true;">
+  <span>Antippen um zu starten</span>
+</div>
+<div class="kisscam-page">
+  <!-- Idle: floating hearts -->
+  <div id="idle-view" class="kisscam-idle">
+    <div id="task-display" class="task-display" style="display:none">
+      <span id="task-text"></span>
+    </div>
+    <div class="floating-heart" style="left:2%;font-size:6rem;animation-duration:7s;animation-delay:0s">&#x2764;</div>
+    <div class="floating-heart" style="left:8%;font-size:4.5rem;animation-duration:9s;animation-delay:1.2s">&#x2764;</div>
+    <div class="floating-heart" style="left:14%;font-size:7rem;animation-duration:8s;animation-delay:0.4s">&#x2764;</div>
+    <div class="floating-heart" style="left:20%;font-size:5rem;animation-duration:10s;animation-delay:2.5s">&#x2764;</div>
+    <div class="floating-heart" style="left:26%;font-size:8rem;animation-duration:7.5s;animation-delay:1s">&#x2764;</div>
+    <div class="floating-heart" style="left:32%;font-size:5.5rem;animation-duration:9.5s;animation-delay:3s">&#x2764;</div>
+    <div class="floating-heart" style="left:37%;font-size:6.5rem;animation-duration:6.5s;animation-delay:0.7s">&#x2764;</div>
+    <div class="floating-heart" style="left:43%;font-size:7.5rem;animation-duration:8.5s;animation-delay:2s">&#x2764;</div>
+    <div class="floating-heart" style="left:48%;font-size:5rem;animation-duration:7.2s;animation-delay:4s">&#x2764;</div>
+    <div class="floating-heart" style="left:54%;font-size:6rem;animation-duration:9.2s;animation-delay:0.3s">&#x2764;</div>
+    <div class="floating-heart" style="left:59%;font-size:8.5rem;animation-duration:8s;animation-delay:1.8s">&#x2764;</div>
+    <div class="floating-heart" style="left:64%;font-size:4.5rem;animation-duration:10.5s;animation-delay:3.5s">&#x2764;</div>
+    <div class="floating-heart" style="left:70%;font-size:7rem;animation-duration:7.8s;animation-delay:0.9s">&#x2764;</div>
+    <div class="floating-heart" style="left:75%;font-size:5.5rem;animation-duration:8.8s;animation-delay:2.3s">&#x2764;</div>
+    <div class="floating-heart" style="left:80%;font-size:6.5rem;animation-duration:6.8s;animation-delay:4.5s">&#x2764;</div>
+    <div class="floating-heart" style="left:85%;font-size:8rem;animation-duration:9s;animation-delay:1.5s">&#x2764;</div>
+    <div class="floating-heart" style="left:90%;font-size:5rem;animation-duration:7.5s;animation-delay:0.6s">&#x2764;</div>
+    <div class="floating-heart" style="left:95%;font-size:6rem;animation-duration:8.2s;animation-delay:3.2s">&#x2764;</div>
+    <div class="floating-heart" style="left:5%;font-size:5.5rem;animation-duration:10s;animation-delay:5s">&#x2764;</div>
+    <div class="floating-heart" style="left:18%;font-size:7.5rem;animation-duration:6.5s;animation-delay:3.8s">&#x2764;</div>
+    <div class="floating-heart" style="left:30%;font-size:4.5rem;animation-duration:9.8s;animation-delay:5.5s">&#x2764;</div>
+    <div class="floating-heart" style="left:42%;font-size:6rem;animation-duration:7s;animation-delay:4.2s">&#x2764;</div>
+    <div class="floating-heart" style="left:55%;font-size:7rem;animation-duration:8.5s;animation-delay:5.8s">&#x2764;</div>
+    <div class="floating-heart" style="left:68%;font-size:5rem;animation-duration:9.5s;animation-delay:4.8s">&#x2764;</div>
+    <div class="floating-heart" style="left:82%;font-size:7.5rem;animation-duration:7.2s;animation-delay:5.2s">&#x2764;</div>
+  </div>
+
+  <!-- Video: fanfare before task reveal -->
+  <div id="video-view" class="video-view" style="display:none">
+    <video id="fanfare-video" playsinline></video>
+  </div>
+
+  <!-- Draw: dramatic name reveal -->
+  <div id="draw-view" class="draw-view" style="display:none">
+    <div class="draw-title">Wer muss ran?</div>
+    <div class="draw-slots">
+      <div class="draw-slot">
+        <div class="draw-slot-label">Person 1</div>
+        <div class="draw-slot-name" id="slot1">?</div>
+      </div>
+      <div class="draw-amp">&amp;</div>
+      <div class="draw-slot">
+        <div class="draw-slot-label">Person 2</div>
+        <div class="draw-slot-name" id="slot2">?</div>
+      </div>
+    </div>
+    <div class="draw-result" id="draw-result" style="display:none"></div>
+  </div>
+
+  <!-- Active / Task running: webcam in heart with optional overlay -->
+  <div id="active-view" class="kisscam-active-wrap" style="display:none">
+    <div class="task-running-text" id="task-running-text" style="display:none"></div>
+    <div class="kisscam-heart-wrap">
+      <svg class="kisscam-svg" viewBox="0 0 200 200">
+        <defs>
+          <clipPath id="heart-clip">
+            <path d="M100 180 C40 120, -10 80, 30 40 C50 20, 80 20, 100 50 C120 20, 150 20, 170 40 C210 80, 160 120, 100 180Z"/>
+          </clipPath>
+        </defs>
+        <image id="webcam-svg" href="" x="0" y="0" width="200" height="200"
+               preserveAspectRatio="xMidYMid slice" clip-path="url(#heart-clip)"/>
+        <path d="M100 180 C40 120, -10 80, 30 40 C50 20, 80 20, 100 50 C120 20, 150 20, 170 40 C210 80, 160 120, 100 180Z"
+              fill="none" stroke="#e11d48" stroke-width="4"/>
+      </svg>
+      <span class="kisscam-page-label" id="kisscam-label">KISS CAM</span>
+    </div>
+    <div class="task-running-names" id="task-running-names" style="display:none"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  var cam = document.getElementById("webcam-svg");
+  var idleView = document.getElementById("idle-view");
+  var activeView = document.getElementById("active-view");
+  var drawView = document.getElementById("draw-view");
+  var taskDisplay = document.getElementById("task-display");
+  var taskText = document.getElementById("task-text");
+  var taskRunningNames = document.getElementById("task-running-names");
+  var taskRunningText = document.getElementById("task-running-text");
+  var videoView = document.getElementById("video-view");
+  var fanfareVideo = document.getElementById("fanfare-video");
+  var fanfareFiles = ["/static/media/fanfare1.mp4", "/static/media/fanfare2.mp4", "/static/media/fanfare3.mp4"];
+  var pendingTask = null;
+  var slot1 = document.getElementById("slot1");
+  var slot2 = document.getElementById("slot2");
+  var drawResult = document.getElementById("draw-result");
+  var kisscamLabel = document.getElementById("kisscam-label");
+  var heartWrap = document.querySelector(".kisscam-heart-wrap");
+  var streaming = false;
+  var streamTimer = null;
+
+  // Sound effects via Web Audio API
+  var audioCtx = null;
+  // Create and unlock AudioContext on first tap
+  document.getElementById("audio-unlock").addEventListener("click", function() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Play a silent buffer to fully unlock
+    var buf = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    var src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+  });
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function playTick(pitch) {
+    var ctx = getAudio();
+    var t = ctx.currentTime;
+    // Clicky wheel sound - two layered tones
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = pitch || 800;
+    osc.type = "square";
+    gain.gain.setValueAtTime(0.08, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    osc.start(t);
+    osc.stop(t + 0.04);
+    // Add a knock
+    var osc2 = ctx.createOscillator();
+    var gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.value = (pitch || 800) * 0.5;
+    osc2.type = "sine";
+    gain2.gain.setValueAtTime(0.1, t);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    osc2.start(t);
+    osc2.stop(t + 0.06);
+  }
+  function playReveal() {
+    var ctx = getAudio();
+    var t = ctx.currentTime;
+    // Big brass fanfare: Bb major chord -> resolves up
+    // Layer 1: sawtooth brass stabs (Bb4, D5, F5, Bb5)
+    var fanfare = [466, 587, 698, 932];
+    fanfare.forEach(function(freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = "sawtooth";
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.12, t + 0.03);
+      gain.gain.setValueAtTime(0.12, t + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+      osc.start(t);
+      osc.stop(t + 0.8);
+    });
+    // Layer 2: triumphant octave jump after short pause
+    var osc2 = ctx.createOscillator();
+    var gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.setValueAtTime(466, t + 0.25);
+    osc2.frequency.linearRampToValueAtTime(932, t + 0.35);
+    osc2.type = "sawtooth";
+    gain2.gain.setValueAtTime(0, t + 0.25);
+    gain2.gain.linearRampToValueAtTime(0.15, t + 0.3);
+    gain2.gain.setValueAtTime(0.15, t + 0.6);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+    osc2.start(t + 0.25);
+    osc2.stop(t + 1.2);
+    // Layer 3: cymbal shimmer
+    var noise = ctx.createBufferSource();
+    var buf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1);
+    noise.buffer = buf;
+    var hpf = ctx.createBiquadFilter();
+    hpf.type = "highpass";
+    hpf.frequency.value = 8000;
+    var gn = ctx.createGain();
+    noise.connect(hpf);
+    hpf.connect(gn);
+    gn.connect(ctx.destination);
+    gn.gain.setValueAtTime(0, t);
+    gn.gain.linearRampToValueAtTime(0.08, t + 0.05);
+    gn.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+    noise.start(t);
+    noise.stop(t + 1.2);
+  }
+  function playFanfare(taskText) {
+    pendingTask = taskText;
+    var file = fanfareFiles[Math.floor(Math.random() * fanfareFiles.length)];
+    fanfareVideo.src = file;
+    showView("video");
+    fanfareVideo.play().catch(function() {
+      // If video can't play (autoplay blocked), skip to task reveal
+      showView("idle");
+      setTask(pendingTask);
+      pendingTask = null;
+    });
+  }
+  fanfareVideo.addEventListener("ended", function() {
+    showView("idle");
+    setTask(pendingTask);
+    pendingTask = null;
+  });
+
+  function playDrumroll() {
+    var ctx = getAudio();
+    var t = ctx.currentTime;
+    // Rapid snare-like hits over 0.5s (tonal, no static)
+    for (var i = 0; i < 15; i++) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 180;
+      osc.type = "triangle";
+      gain.gain.setValueAtTime(0.12, t + i * 0.033);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.033 + 0.04);
+      osc.start(t + i * 0.033);
+      osc.stop(t + i * 0.033 + 0.04);
+    }
+  }
+
+  function showView(name) {
+    idleView.style.display = name === "idle" ? "" : "none";
+    activeView.style.display = (name === "active" || name === "task") ? "" : "none";
+    drawView.style.display = name === "draw" ? "" : "none";
+    videoView.style.display = name === "video" ? "" : "none";
+    if (name !== "video") { fanfareVideo.pause(); fanfareVideo.removeAttribute("src"); }
+    if (name === "active" || name === "task") {
+      if (!streaming) { streaming = true; refreshCam(); }
+    } else {
+      streaming = false;
+      if (streamTimer) { clearTimeout(streamTimer); streamTimer = null; }
+    }
+    // In task mode: hide KISS CAM label, maximize heart
+    kisscamLabel.style.display = name === "task" ? "none" : "";
+    heartWrap.classList.toggle("heart-maximized", name === "task");
+    // Show/hide task overlay on the cam view
+    if (name === "task") {
+      taskRunningNames.style.display = "";
+      taskRunningText.style.display = "";
+    } else {
+      taskRunningNames.style.display = "none";
+      taskRunningText.style.display = "none";
+    }
+  }
+
+  function setActive(active) {
+    showView(active ? "active" : "idle");
+  }
+
+  function setTask(text) {
+    if (text) {
+      taskText.textContent = text;
+      taskDisplay.style.display = "";
+    } else {
+      taskDisplay.style.display = "none";
+      taskText.textContent = "";
+    }
+  }
+
+  function spinSlot(el, names, winner, duration, callback) {
+    var shuffled = names.slice();
+    var interval = 50;
+    var elapsed = 0;
+    var slowStart = duration * 0.5;
+    el.textContent = "?";
+    el.classList.remove("draw-slot-reveal");
+
+    function tick() {
+      var pick = shuffled[Math.floor(Math.random() * shuffled.length)];
+      el.textContent = pick;
+      elapsed += interval;
+      // Tick sound - pitch rises as it slows
+      var pitch = 600 + (elapsed / duration) * 600;
+      playTick(pitch);
+
+      if (elapsed >= duration) {
+        el.textContent = winner;
+        el.classList.add("draw-slot-reveal");
+        playReveal();
+        if (callback) callback();
+        return;
+      }
+
+      if (elapsed > slowStart) {
+        var progress = (elapsed - slowStart) / (duration - slowStart);
+        interval = 50 + Math.floor(progress * 350);
+      }
+      setTimeout(tick, interval);
+    }
+    tick();
+  }
+
+  function startDraw(allNames, selected) {
+    showView("draw");
+    slot1.textContent = "?";
+    slot2.textContent = "?";
+    slot1.classList.remove("draw-slot-reveal");
+    slot2.classList.remove("draw-slot-reveal");
+    drawResult.style.display = "none";
+    playDrumroll();
+
+    setTimeout(function() {
+      spinSlot(slot1, allNames, selected[0], 3000, function() {
+        setTimeout(function() {
+          spinSlot(slot2, allNames, selected[1], 3000, function() {
+            drawResult.textContent = selected[0] + " & " + selected[1];
+            drawResult.style.display = "";
+          });
+        }, 800);
+      });
+    }, 500);
+  }
+
+  function showTaskRunning(task, names) {
+    taskRunningNames.textContent = names[0] + " & " + names[1];
+    taskRunningText.textContent = task;
+    showView("task");
+  }
+
+  function refreshCam() {
+    if (!streaming) return;
+    var img = new Image();
+    img.onload = function() {
+      cam.setAttribute("href", img.src);
+      streamTimer = setTimeout(refreshCam, 66);
+    };
+    img.onerror = function() {
+      streamTimer = setTimeout(refreshCam, 1000);
+    };
+    img.src = "{{ stream_url }}?t=" + Date.now();
+  }
+
+  // Initial state
+  fetch("/kisscam/state")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.task_running && data.current_task && data.drawn) {
+        showTaskRunning(data.current_task, data.drawn);
+      } else if (data.active) {
+        showView("active");
+      } else {
+        showView("idle");
+        setTask(data.current_task);
+      }
+    });
+
+  var proto = location.protocol === "https:" ? "wss:" : "ws:";
+  var ws = new WebSocket(proto + "//" + location.host + "/ws");
+  ws.onmessage = function(ev) {
+    var msg = JSON.parse(ev.data);
+    if (msg.type === "kisscam_state") {
+      setActive(msg.active);
+    } else if (msg.type === "task_selected") {
+      playFanfare(msg.text);
+    } else if (msg.type === "draw_attendees") {
+      startDraw(msg.all_names, msg.selected);
+    } else if (msg.type === "start_task") {
+      showTaskRunning(msg.task, msg.names);
+    } else if (msg.type === "stop_task") {
+      showView("idle");
+      setTask(null);
+    }
+  };
+  ws.onclose = function() {
+    setTimeout(function() { location.reload(); }, 3000);
+  };
+})();
+</script>
+{% endblock %}

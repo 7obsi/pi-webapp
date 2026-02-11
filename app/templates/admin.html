@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+
+{% block body %}
+<div class="container mobile-page">
+  <h1>Admin</h1>
+
+  <!-- Kiss Cam -->
+  <div style="text-align:center;margin-bottom:1rem">
+    <p style="margin-bottom:.75rem;font-size:1.1rem">
+      Kiss Cam: <strong>{{ "ACTIVE" if active else "IDLE" }}</strong>
+    </p>
+    <form method="post" action="/admin/toggle">
+      <button type="submit" class="admin-toggle {{ 'active' if active else '' }}">
+        {{ "Deactivate Kiss Cam" if active else "Activate Kiss Cam" }}
+      </button>
+    </form>
+  </div>
+
+  <hr style="margin:1.25rem 0;border:none;border-top:1px solid #ddd">
+
+  <!-- Task Flow -->
+  <div style="text-align:center;margin-bottom:1rem">
+    <p style="margin-bottom:.5rem;font-size:1.1rem">
+      Aufgabe: <strong>{{ current_task if current_task else "Keine" }}</strong>
+    </p>
+    {% if drawn %}
+    <p style="margin-bottom:.75rem;font-size:1.1rem">
+      Personen: <strong>{{ drawn[0] }} &amp; {{ drawn[1] }}</strong>
+    </p>
+    {% endif %}
+
+    <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">
+      {% if task_running %}
+      <!-- Task is running -> only show Stop -->
+      <form method="post" action="/admin/stop-task">
+        <button type="submit" class="admin-toggle active">Aufgabe beenden</button>
+      </form>
+      {% elif drawn %}
+      <!-- People drawn -> show Start + re-draw + cancel -->
+      <form method="post" action="/admin/start-task">
+        <button type="submit" class="admin-toggle">Aufgabe starten</button>
+      </form>
+      <form method="post" action="/admin/draw">
+        <button type="submit" class="admin-toggle" style="background:#d97706">Neu ziehen</button>
+      </form>
+      <form method="post" action="/admin/clear-task">
+        <button type="submit" class="admin-toggle" style="background:#6b7280;padding:.9rem 1rem">Abbrechen</button>
+      </form>
+      {% elif current_task %}
+      <!-- Task selected, no people yet -> draw people or cancel -->
+      <form method="post" action="/admin/draw">
+        <button type="submit" class="admin-toggle" style="background:#d97706" {% if attendees|length < 2 %}disabled{% endif %}>
+          Personen ziehen
+        </button>
+      </form>
+      <form method="post" action="/admin/clear-task">
+        <button type="submit" class="admin-toggle" style="background:#6b7280;padding:.9rem 1rem">Ausblenden</button>
+      </form>
+      {% else %}
+      <!-- Nothing active -> pick a task -->
+      <form method="post" action="/admin/pick-task">
+        <button type="submit" class="admin-toggle" style="background:#7c3aed">
+          Aufgabe ziehen ({{ unused_count }})
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <hr style="margin:1.25rem 0;border:none;border-top:1px solid #ddd">
+
+  <!-- Attendees -->
+  <h2>Gaeste ({{ attendees|length }})</h2>
+
+  <form method="post" action="/admin/attendees" class="attendee-form">
+    <input name="name" type="text" required placeholder="Name..." autocomplete="off">
+    <button type="submit">+</button>
+  </form>
+
+  <ul class="attendee-list">
+    {% for a in attendees %}
+    <li class="attendee-item">
+      <span>{{ a.name }}</span>
+      <form method="post" action="/admin/attendees/{{ a.id }}/delete" class="inline-form">
+        <button type="submit" class="delete-btn" title="Loeschen">&times;</button>
+      </form>
+    </li>
+    {% else %}
+    <li class="no-tasks">Keine Gaeste</li>
+    {% endfor %}
+  </ul>
+
+  <nav class="bottom-nav">
+    <a href="/tasks/add">Aufgabe hinzufuegen</a>
+    <a href="/tasks/manage">Aufgaben verwalten</a>
+  </nav>
+</div>
+{% endblock %}

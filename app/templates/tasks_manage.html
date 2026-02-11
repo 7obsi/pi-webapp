@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Aufgaben verwalten{% endblock %}
+
+{% block body %}
+<div class="container mobile-page">
+  <h1>Aufgaben ({{ tasks|length }})</h1>
+
+  <ul class="manage-list">
+    {% for task in tasks %}
+    <li class="manage-item {% if task.status == 'used' %}task-used{% endif %}">
+      <span class="manage-text">{{ task.text }}</span>
+      {% if task.status == 'used' %}
+      <span class="used-badge">benutzt</span>
+      {% endif %}
+      <form method="post" action="/tasks/{{ task.id }}/delete" class="inline-form">
+        <button type="submit" class="delete-btn" title="Loeschen">&times;</button>
+      </form>
+    </li>
+    {% else %}
+    <li class="no-tasks">Keine Aufgaben vorhanden.</li>
+    {% endfor %}
+  </ul>
+
+  <nav class="bottom-nav">
+    <a href="/admin">Admin</a>
+    <a href="/tasks/add">Aufgabe hinzufuegen</a>
+  </nav>
+</div>
+{% endblock %}

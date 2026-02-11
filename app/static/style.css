@@ -1,38 +1,514 @@
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#222;line-height:1.5}
-.container{max-width:640px;margin:0 auto;padding:1rem}
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0
+}
 
-/* Login */
-.login-container{margin-top:15vh}
-.login-container h1{margin-bottom:1rem}
-.login-container form{display:flex;flex-direction:column;gap:.5rem}
-.login-container input{padding:.5rem;font-size:1rem;border:1px solid #ccc;border-radius:4px}
-.login-container button{padding:.6rem;font-size:1rem;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer}
-.login-container button:hover{background:#1d4ed8}
-.hint{margin-top:.75rem;font-size:.85rem;color:#666}
-.error{color:#dc2626;margin-bottom:.5rem}
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    line-height: 1.5
+}
 
-/* Topbar */
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-.topbar h1{font-size:1.4rem}
-.user-info{font-size:.9rem}
-.user-info a{color:#2563eb;text-decoration:none}
+.container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1rem
+}
 
-/* Stream */
-.stream-section{margin-bottom:1rem;background:#000;border-radius:6px;overflow:hidden}
-.stream{width:100%;display:block}
+/* Mobile-friendly pages */
+.mobile-page {
+    padding: 1rem 1rem 5rem
+}
 
-/* Task form */
-.task-form form{display:flex;gap:.5rem}
-.task-form input{flex:1;padding:.5rem;font-size:1rem;border:1px solid #ccc;border-radius:4px}
-.task-form button{padding:.5rem 1rem;font-size:1rem;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.mobile-page h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem
+}
 
-/* Task list */
-.tasks{list-style:none;margin-top:1rem}
-.task{display:flex;align-items:center;gap:.5rem;padding:.6rem .5rem;border-bottom:1px solid #e5e5e5}
-.task-text{flex:1}
-.task-meta{font-size:.8rem;color:#888}
-.task-done .task-text{text-decoration:line-through;color:#999}
-.inline-form button{background:none;border:1px solid #22c55e;color:#22c55e;border-radius:4px;cursor:pointer;font-size:1.1rem;padding:0 .4rem}
-.inline-form button:hover{background:#22c55e;color:#fff}
-.no-tasks{padding:1rem 0;color:#999;text-align:center}
+.mobile-page h2 {
+    font-size: 1.2rem;
+    margin-bottom: .75rem
+}
+
+/* Bottom navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    padding: .6rem
+}
+
+.bottom-nav a {
+    flex: 1;
+    text-align: center;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: .95rem;
+    padding: .4rem
+}
+
+/* Stream (TV display) */
+.stream-section {
+    background: #000;
+    position: relative;
+    aspect-ratio: 4/3;
+    max-height: 50vh;
+    max-width: 100%;
+    margin: 0 auto
+}
+
+.stream {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block
+}
+
+.heart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none
+}
+
+.kisscam-label {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Impact, sans-serif;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    color: #e11d48;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    text-shadow: 0 0 10px rgba(225, 29, 72, .6), 2px 2px 0 #000;
+    pointer-events: none
+}
+
+/* Audio unlock overlay */
+.audio-unlock {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, .8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer
+}
+
+.audio-unlock span {
+    font-family: system-ui, sans-serif;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    color: #fff;
+    background: rgba(255, 255, 255, .15);
+    padding: 1.5rem 3rem;
+    border-radius: 16px
+}
+
+/* Kiss Cam fullscreen page */
+.kisscam-page {
+    display: flex; /*TODO: remove flex*/
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: #ec4899;
+    overflow: hidden
+}
+
+.kisscam-heart-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(95vw, 90vh);
+    flex-shrink: 1;
+    min-height: 0
+}
+
+.heart-maximized {
+    width: auto;
+    flex: 1
+}
+
+.heart-maximized .kisscam-svg {
+    height: 100%;
+    width: auto
+}
+
+.kisscam-svg {
+    width: 100%;
+    height: auto;
+    display: block
+}
+
+.kisscam-page-label {
+    font-family: Impact, sans-serif;
+    font-size: clamp(2rem, 6vw, 5rem);
+    color: #e11d48;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    text-shadow: 0 0 12px rgba(225, 29, 72, .6), 3px 3px 0 #000;
+    margin-top: .25rem
+}
+
+/* Kiss Cam idle: floating hearts */
+.kisscam-idle {
+    position: absolute;
+    inset: 0;
+    overflow: hidden
+}
+
+.floating-heart {
+    position: absolute;
+    bottom: -10%;
+    color: #e11d48;
+    opacity: .7;
+    animation: float-up linear infinite
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: .7
+    }
+    100% {
+        transform: translateY(-110vh) rotate(30deg);
+        opacity: 0
+    }
+}
+
+/* Task display on idle screen */
+.task-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, .65);
+    border-radius: 20px;
+    padding: 2rem 3rem;
+    max-width: 85vw;
+    text-align: center
+}
+
+.task-display span {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    color: #fff;
+    font-weight: bold;
+    line-height: 1.3
+}
+
+/* Admin */
+.admin-toggle {
+    padding: .9rem 2rem;
+    font-size: 1.3rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #22c55e;
+    color: #fff;
+    font-weight: bold;
+    width: 100%;
+    max-width: 320px
+}
+
+.admin-toggle:hover {
+    opacity: .9
+}
+
+.admin-toggle.active {
+    background: #dc2626
+}
+
+/* Attendees */
+.attendee-form {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .75rem
+}
+
+.attendee-form input {
+    flex: 1;
+    padding: .6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px
+}
+
+.attendee-form button {
+    padding: .6rem 1rem;
+    font-size: 1.2rem;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer
+}
+
+.attendee-list {
+    list-style: none
+}
+
+.attendee-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .6rem .25rem;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 1.05rem
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: .2rem .5rem;
+    line-height: 1;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.delete-btn:hover {
+    color: #991b1b
+}
+
+/* Add task form */
+.add-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem
+}
+
+.add-task-form textarea {
+    padding: .6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit
+}
+
+.add-task-form button {
+    padding: .7rem;
+    font-size: 1.1rem;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold
+}
+
+.saved-msg {
+    background: #22c55e;
+    color: #fff;
+    padding: .5rem 1rem;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: bold
+}
+
+/* Manage tasks list */
+.manage-list {
+    list-style: none
+}
+
+.manage-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .6rem .25rem;
+    border-bottom: 1px solid #e5e5e5
+}
+
+.manage-text {
+    flex: 1;
+    font-size: 1.05rem;
+    padding-right: .5rem
+}
+
+.task-done .manage-text {
+    text-decoration: line-through;
+    color: #999
+}
+
+.task-used .manage-text {
+    color: #999
+}
+
+.used-badge {
+    font-size: .75rem;
+    background: #7c3aed;
+    color: #fff;
+    padding: .15rem .5rem;
+    border-radius: 4px;
+    white-space: nowrap
+}
+
+.no-tasks {
+    padding: 1rem 0;
+    color: #999;
+    text-align: center
+}
+
+.inline-form {
+    display: flex
+}
+
+/* Draw view */
+.draw-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    text-align: center;
+    padding: 2rem
+}
+
+.draw-title {
+    font-family: Impact, sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    text-shadow: 3px 3px 0 #000, 0 0 20px rgba(255, 255, 255, .3);
+    margin-bottom: 2rem
+}
+
+.draw-slots {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem
+}
+
+.draw-slot {
+    background: rgba(0, 0, 0, .6);
+    border-radius: 16px;
+    padding: 1.5rem 2.5rem;
+    min-width: min(35vw, 300px)
+}
+
+.draw-slot-label {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: .5rem;
+    text-transform: uppercase;
+    letter-spacing: .1em
+}
+
+.draw-slot-name {
+    font-family: Impact, sans-serif;
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    color: #fbbf24;
+    min-height: 1.2em;
+    transition: color .3s
+}
+
+.draw-slot-reveal {
+    color: #fff;
+    animation: reveal-pop .4s ease-out
+}
+
+.draw-amp {
+    font-family: Impact, sans-serif;
+    font-size: clamp(2rem, 4vw, 4rem);
+    color: #fff;
+    text-shadow: 2px 2px 0 #000
+}
+
+.draw-result {
+    margin-top: 2rem;
+    font-family: Impact, sans-serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    color: #fbbf24;
+    text-shadow: 3px 3px 0 #000, 0 0 30px rgba(251, 191, 36, .5);
+    animation: reveal-pop .5s ease-out
+}
+
+@keyframes reveal-pop {
+    0% {
+        transform: scale(1.8);
+        opacity: 0
+    }
+    50% {
+        transform: scale(1.1)
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1
+    }
+}
+
+/* Fanfare video view */
+.video-view {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.video-view video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain
+}
+
+/* Active cam wrap (kiss cam + task overlay) */
+.kisscam-active-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    gap: .5rem;
+    padding: 1vh 1rem;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden
+}
+
+.task-running-names {
+    font-family: Impact, sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    text-shadow: 4px 4px 0 #000, 0 0 30px rgba(255, 255, 255, .3);
+    text-align: center;
+    flex-shrink: 0
+}
+
+.task-running-text {
+    background: rgba(0, 0, 0, .6);
+    border-radius: 16px;
+    padding: .8rem 2rem;
+    max-width: 85vw;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: clamp(1.3rem, 3vw, 2.5rem);
+    color: #fbbf24;
+    font-weight: bold;
+    line-height: 1.3;
+    text-shadow: 2px 2px 0 #000;
+    text-align: center;
+    flex-shrink: 0
+}

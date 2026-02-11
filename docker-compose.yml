@@ -5,14 +5,13 @@ services:
     environment:
       - STREAM_URL=/stream
     volumes:
-      - db-data:/app
+      - db-data:/app/data
     restart: unless-stopped
 
   stream:
     build: .
-    command: python scripts/webcam_stream.py
-    devices:
-      - /dev/video0:/dev/video0
+    command: python -u scripts/webcam_stream.py
+    privileged: true
     restart: unless-stopped
 
   caddy:
