@@ -4,6 +4,7 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     environment:
       - STREAM_URL=/stream
+      - STREAM_INTERNAL_URL=http://stream:8081
     volumes:
       - db-data:/app/data
     restart: unless-stopped
@@ -12,6 +13,11 @@ services:
     build: .
     command: python -u scripts/webcam_stream.py
     privileged: true
+    environment:
+      - RECORDINGS_DIR=/recordings
+      - RECORD_FPS=15
+    volumes:
+      - ./recordings:/recordings
     restart: unless-stopped
 
   caddy:

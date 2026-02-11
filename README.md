@@ -1,96 +1,110 @@
 # Pi Webapp
 
-Aufgaben-App mit Live-Webcam-Stream, Mehrbenutzer-Login und Echtzeit-Updates per WebSocket. Laeuft auf einem Raspberry Pi im lokalen Netzwerk.
+Task app with live webcam stream, multi-user login, and realtime updates via WebSocket. Runs on a Raspberry Pi in the local network.
 
 ## Features
 
-- Webcam-Livestream im Browser
-- Login mit Name + optionaler PIN (automatische Registrierung)
-- Aufgaben erstellen und abhaken
-- Live-Updates auf allen Geraeten per WebSocket
-- Alles per Docker in einem Befehl startbar
+- Live webcam stream in the browser
+- Login with name + optional PIN (auto-registration)
+- Create and complete tasks
+- Live updates on all devices via WebSocket
+- Runs via Docker in one command
+- Optional task video recording (saved on the Pi)
+- Warm-up countdown before tasks start
+- No-repeat cooldown for attendee draws
 
-## Voraussetzungen auf dem Raspberry Pi
+## Requirements on the Raspberry Pi
 
-- Raspberry Pi OS (64-bit empfohlen)
-- Docker und Docker Compose installiert
-- USB-Webcam oder offizielle Pi-Kamera
+- Raspberry Pi OS (64-bit recommended)
+- Docker and Docker Compose installed
+- USB webcam or official Pi camera
 
-### Docker installieren
+### Install Docker
 
 ```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
-# Danach neu einloggen oder reboot
+# Log out and back in or reboot
 ```
 
-### Pi-Kamera aktivieren (nur bei Ribbon-Kabel-Kamera)
+### Enable Pi camera (only for ribbon cable camera)
 
 ```bash
 sudo raspi-config
-# → Interface Options → Camera → Enable
+# -> Interface Options -> Camera -> Enable
 sudo reboot
 ```
 
-Bei einer USB-Webcam ist dieser Schritt nicht noetig.
+If you use a USB webcam, this step is not required.
 
 ## Installation
 
-### 1. Projekt auf den Pi kopieren
+### 1. Copy the project to the Pi
 
-Vom Laptop aus:
+From your laptop:
 
 ```bash
 scp -r ~/Documents/private_workspace/pi-webapp pi@<pi-ip>:~/pi-webapp
 ```
 
-`<pi-ip>` durch die IP-Adresse des Pi ersetzen (z.B. `192.168.1.50`).
+Replace `<pi-ip>` with your Pi's IP address (e.g. `192.168.1.50`).
 
-### 2. Webcam anschliessen
+### 2. Connect the webcam
 
-USB-Webcam einstecken und pruefen:
+Plug in the USB webcam and verify:
 
 ```bash
 ls /dev/video0
 ```
 
-Wenn die Datei existiert, ist die Kamera erkannt.
+If the file exists, the camera is detected.
 
-### 3. App starten
+### 3. Start the app
 
 ```bash
 cd ~/pi-webapp
 docker compose up -d
 ```
 
-Beim ersten Start wird das Docker-Image gebaut (dauert ein paar Minuten).
+The first build takes a few minutes.
 
-### 4. Im Browser oeffnen
+### 4. Open in the browser
 
-Von jedem Geraet im selben Netzwerk:
+From any device on the same network:
 
 ```
 http://<pi-ip>
 ```
 
-## Nuetzliche Befehle
+## Useful commands
 
 ```bash
-# Logs anzeigen
+# View logs
 docker compose logs -f
 
-# App stoppen
+# Stop the app
 docker compose down
 
-# App neu bauen (nach Code-Aenderungen)
+# Rebuild (after code changes)
 docker compose up -d --build
 ```
 
-## Lokale Entwicklung (ohne Docker)
+## Recording (Task Videos)
 
-Auf dem Laptop zum Testen:
+When a task starts, recording begins; when it ends, recording stops.
+Videos are saved on the Pi under `recordings/` with timestamps, names, and task text in the filename.
+Recording can be enabled/disabled in the Admin page and the setting persists across restarts.
 
-**Terminal 1 — Webcam-Stream:**
+## Countdown + No-repeat cooldown
+
+When a task starts, the kisscam shows a 3-2-1 countdown before the task overlay appears.
+You can set how many rounds an attendee is excluded from re-draw in the Admin page.
+
+## Local Development (without Docker)
+
+On your laptop for testing:
+
+**Terminal 1 — Webcam stream:**
 
 ```bash
 cd pi-webapp
@@ -101,7 +115,7 @@ pip install opencv-python
 python scripts/webcam_stream.py
 ```
 
-**Terminal 2 — Web-App:**
+**Terminal 2 — Web app:**
 
 ```bash
 cd pi-webapp
@@ -109,12 +123,12 @@ source .venv/bin/activate
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Dann im Browser: `http://localhost:8000`
+Then open: `http://localhost:8000`
 
-## Architektur
+## Architecture
 
-| Service | Port | Beschreibung |
-|---------|------|--------------|
-| web | 8000 | FastAPI App (Jinja2 + HTMX) |
-| stream | 8081 | MJPEG Webcam-Stream |
-| caddy | 80 | Reverse Proxy (buendelt alles) |
+| Service | Port | Description |
+|---------|------|-------------|
+| web | 8000 | FastAPI app (Jinja2 + HTMX) |
+| stream | 8081 | MJPEG webcam stream |
+| caddy | 80 | Reverse proxy (bundles everything) |

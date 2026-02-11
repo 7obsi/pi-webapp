@@ -57,20 +57,19 @@
         <div class="draw-slot-name" id="slot2">?</div>
       </div>
     </div>
-    <div class="draw-result" id="draw-result" style="display:none"></div>
   </div>
 
   <!-- Active / Task running: webcam in heart with optional overlay -->
   <div id="active-view" class="kisscam-active-wrap" style="display:none">
     <div class="task-running-text" id="task-running-text" style="display:none"></div>
     <div class="kisscam-heart-wrap">
-      <svg class="kisscam-svg" viewBox="0 0 200 200">
+      <svg class="kisscam-svg" viewBox="-10 -10 220 220">
         <defs>
           <clipPath id="heart-clip">
             <path d="M100 180 C40 120, -10 80, 30 40 C50 20, 80 20, 100 50 C120 20, 150 20, 170 40 C210 80, 160 120, 100 180Z"/>
           </clipPath>
         </defs>
-        <image id="webcam-svg" href="" x="0" y="0" width="200" height="200"
+        <image id="webcam-svg" href="" x="-10" y="-10" width="220" height="220"
                preserveAspectRatio="xMidYMid slice" clip-path="url(#heart-clip)"/>
         <path d="M100 180 C40 120, -10 80, 30 40 C50 20, 80 20, 100 50 C120 20, 150 20, 170 40 C210 80, 160 120, 100 180Z"
               fill="none" stroke="#e11d48" stroke-width="4"/>
@@ -78,6 +77,11 @@
       <span class="kisscam-page-label" id="kisscam-label">KISS CAM</span>
     </div>
     <div class="task-running-names" id="task-running-names" style="display:none"></div>
+  </div>
+
+  <!-- Countdown overlay -->
+  <div id="countdown-overlay" class="countdown-overlay" style="display:none">
+    <div id="countdown-number" class="countdown-number">3</div>
   </div>
 </div>
 {% endblock %}
@@ -99,11 +103,13 @@
   var pendingTask = null;
   var slot1 = document.getElementById("slot1");
   var slot2 = document.getElementById("slot2");
-  var drawResult = document.getElementById("draw-result");
   var kisscamLabel = document.getElementById("kisscam-label");
   var heartWrap = document.querySelector(".kisscam-heart-wrap");
   var streaming = false;
   var streamTimer = null;
+  var countdownOverlay = document.getElementById("countdown-overlay");
+  var countdownNumber = document.getElementById("countdown-number");
+  var countdownTimer = null;
 
   // Sound effects via Web Audio API
   var audioCtx = null;
@@ -242,6 +248,10 @@
     activeView.style.display = (name === "active" || name === "task") ? "" : "none";
     drawView.style.display = name === "draw" ? "" : "none";
     videoView.style.display = name === "video" ? "" : "none";
+    if (name !== "active") {
+      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+      countdownOverlay.style.display = "none";
+    }
     if (name !== "video") { fanfareVideo.pause(); fanfareVideo.removeAttribute("src"); }
     if (name === "active" || name === "task") {
       if (!streaming) { streaming = true; refreshCam(); }
@@ -315,15 +325,12 @@
     slot2.textContent = "?";
     slot1.classList.remove("draw-slot-reveal");
     slot2.classList.remove("draw-slot-reveal");
-    drawResult.style.display = "none";
     playDrumroll();
 
     setTimeout(function() {
       spinSlot(slot1, allNames, selected[0], 3000, function() {
         setTimeout(function() {
           spinSlot(slot2, allNames, selected[1], 3000, function() {
-            drawResult.textContent = selected[0] + " & " + selected[1];
-            drawResult.style.display = "";
           });
         }, 800);
       });
@@ -334,6 +341,24 @@
     taskRunningNames.textContent = names[0] + " & " + names[1];
     taskRunningText.textContent = task;
     showView("task");
+  }
+
+  function runCountdown(onDone) {
+    var value = 3;
+    countdownNumber.textContent = value;
+    countdownOverlay.style.display = "";
+    if (countdownTimer) { clearInterval(countdownTimer); }
+    countdownTimer = setInterval(function() {
+      value -= 1;
+      if (value <= 0) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+        countdownOverlay.style.display = "none";
+        if (onDone) onDone();
+        return;
+      }
+      countdownNumber.textContent = value;
+    }, 1000);
   }
 
   function refreshCam() {
@@ -374,8 +399,13 @@
     } else if (msg.type === "draw_attendees") {
       startDraw(msg.all_names, msg.selected);
     } else if (msg.type === "start_task") {
-      showTaskRunning(msg.task, msg.names);
+      showView("active");
+      runCountdown(function() {
+        showTaskRunning(msg.task, msg.names);
+      });
     } else if (msg.type === "stop_task") {
+      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+      countdownOverlay.style.display = "none";
       showView("idle");
       setTask(null);
     }

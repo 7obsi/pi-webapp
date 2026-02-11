@@ -17,6 +17,27 @@
     </form>
   </div>
 
+  <div style="text-align:center;margin-bottom:1rem">
+    <p style="margin-bottom:.75rem;font-size:1.1rem">
+      Recording: <strong>{{ "ON" if recording_enabled else "OFF" }}</strong>
+    </p>
+    <form method="post" action="/admin/toggle-recording">
+      <button type="submit" class="admin-toggle {{ 'active' if recording_enabled else '' }}">
+        {{ "Disable Recording" if recording_enabled else "Enable Recording" }}
+      </button>
+    </form>
+  </div>
+
+  <div style="text-align:center;margin-bottom:1rem">
+    <p style="margin-bottom:.5rem;font-size:1.1rem">
+      Cooldown rounds (no-repeat): <strong>{{ cooldown_rounds }}</strong>
+    </p>
+    <form method="post" action="/admin/set-cooldown" style="display:flex;gap:.5rem;justify-content:center;align-items:center;flex-wrap:wrap">
+      <input name="rounds" type="number" min="0" max="20" value="{{ cooldown_rounds }}" style="width:6rem;padding:.6rem;border:1px solid #ccc;border-radius:6px">
+      <button type="submit" class="admin-toggle" style="max-width:200px">Save</button>
+    </form>
+  </div>
+
   <hr style="margin:1.25rem 0;border:none;border-top:1px solid #ddd">
 
   <!-- Task Flow -->

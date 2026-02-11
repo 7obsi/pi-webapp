@@ -11,6 +11,9 @@
       <span class="manage-text">{{ task.text }}</span>
       {% if task.status == 'used' %}
       <span class="used-badge">benutzt</span>
+      <form method="post" action="/tasks/{{ task.id }}/reopen" class="inline-form">
+        <button type="submit" class="admin-toggle" style="max-width:160px;padding:.4rem .8rem;font-size:.9rem;background:#0ea5e9">Reaktivieren</button>
+      </form>
       {% endif %}
       <form method="post" action="/tasks/{{ task.id }}/delete" class="inline-form">
         <button type="submit" class="delete-btn" title="Loeschen">&times;</button>
